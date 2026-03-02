@@ -1,4 +1,4 @@
-[index.html](https://github.com/user-attachments/files/25677835/index.html)
+[index (1).html](https://github.com/user-attachments/files/25677973/index.1.html)
 <html lang="zh-HKT">
 <head>
     <meta charset="UTF-8">
@@ -237,6 +237,21 @@
             </ol>
         </section>
 
+        <!-- 查看記錄區 -->
+        <section id="view-section" style="display: none;">
+            <h2>查看記錄</h2>
+            <div class="form-group">
+                <label>選擇月份查看:</label>
+                <select id="month-select" onchange="showMonth()">
+                    <option value="">選擇月份</option>
+                </select>
+            </div>
+            <div id="month-view" class="month-view"></div>
+            
+            <h3 style="margin-top: 30px;">所有記錄</h3>
+            <div id="single-records"></div>
+        </section>
+
         <!-- 指南區 -->
         <section id="guide-section" style="display: none;">
         </section>
@@ -321,21 +336,26 @@
 
         function updateRecords() {
             const singleDiv = document.getElementById('single-records');
-            singleDiv.innerHTML = records.map(r => `
-                <div class="record">
-                    <img src="${r.photo}" alt="咖啡相片">
-                    <div class="record-meta">
-                        <p><strong>日期:</strong> ${r.date}</p>
-                        <p><strong>時間:</strong> ${r.time} 分</p>
-                        <p><strong>方式:</strong> ${r.method}</p>
-                        <p><strong>烘焙:</strong> ${r.roast}</p>
-                        <p><strong>豆子:</strong> ${r.bean}</p>
-                        <p><strong>心得:</strong> ${r.notes}</p>
+            if (records.length === 0) {
+                singleDiv.innerHTML = '<p style="color: #999;">暫沒有記錄，開始紀錄你的咖啡故事吧！</p>';
+            } else {
+                singleDiv.innerHTML = records.map(r => `
+                    <div class="record">
+                        <img src="${r.photo}" alt="咖啡相片">
+                        <div class="record-meta">
+                            <p><strong>日期:</strong> ${r.date}</p>
+                            <p><strong>時間:</strong> ${r.time} 分</p>
+                            <p><strong>方式:</strong> ${r.method}</p>
+                            <p><strong>烘焙:</strong> ${r.roast}</p>
+                            <p><strong>豆子:</strong> ${r.bean}</p>
+                            <p><strong>心得:</strong> ${r.notes}</p>
+                            <button onclick="deleteRecord(${r.id})" style="background: #e74c3c; padding: 5px 10px; margin-top: 10px;">刪除</button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
 
-            const months = [...new Set(records.map(r => r.date.slice(0,7)))];
+            const months = [...new Set(records.map(r => r.date.slice(0,7)))].sort().reverse();
             const select = document.getElementById('month-select');
             select.innerHTML = '<option value="">選擇月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
         }
@@ -348,18 +368,32 @@
                 return;
             }
             const monthRecords = records.filter(r => r.date.startsWith(month));
-            monthDiv.innerHTML = monthRecords.map(r => `
-                <div class="thumbnail">
-                    <img src="${r.photo}" onclick="viewDetail(${r.id})" title="${r.notes.substring(0,50)}...">
-                    <p>${r.date.slice(8)}</p>
-                </div>
-            `).join('');
+            if (monthRecords.length === 0) {
+                monthDiv.innerHTML = '<p style="color: #999;">該月份暫無記錄</p>';
+            } else {
+                monthDiv.innerHTML = monthRecords.map(r => `
+                    <div class="thumbnail">
+                        <img src="${r.photo}" onclick="viewDetail(${r.id})" title="${r.notes.substring(0,50)}...">
+                        <p>${r.date.slice(8)} 日</p>
+                    </div>
+                `).join('');
+            }
         }
 
         function viewDetail(id) {
             const record = records.find(r => r.id === id);
             if (record) {
-                alert(`日期: ${record.date}\n心得: ${record.notes}`);
+                alert(`日期: ${record.date}\n時間: ${record.time} 分鐘\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n心得: ${record.notes}`);
+            }
+        }
+
+        function deleteRecord(id) {
+            if (confirm('確定要刪除這筆記錄嗎？')) {
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem('coffeeRecords', JSON.stringify(records));
+                updateRecords();
+                showMonth();
+                alert('記錄已刪除！');
             }
         }
     </script>
