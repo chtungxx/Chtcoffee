@@ -1,8 +1,16 @@
-[index (3).html](https://github.com/user-attachments/files/25678722/index.3.html)
+[20260302.html](https://github.com/user-attachments/files/25680220/20260302.html)
 <html lang="zh-HKT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#8B4513">
+    <meta name="description" content="咖啡沖煮記錄應用 - 記錄每一杯咖啡的故事">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Today's Coffee">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238B4513' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%238B4513' width='180' height='180' rx='40'/><text x='90' y='90' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
+    <link rel="manifest" href="/manifest.json">
     <title>오늘커피 ☕️ Today’s Coffee</title>
     <style>
         * {
@@ -167,6 +175,10 @@
                 <input type="date" id="record-date">
             </div>
             <div class="form-group">
+                <label>沖煮時間（時:分，可選）:</label>
+                <input type="time" id="brew-time">
+            </div>
+            <div class="form-group">
                 <label>沖煮時間 (分鐘):</label>
                 <input type="number" id="time" min="1" max="10">
             </div>
@@ -265,12 +277,7 @@
         <!-- 查看記錄區 -->
         <section id="view-section" style="display: none;">
             <h2>查看記錄</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button onclick="exportRecords()" style="background: #2196F3; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">📥 導出記錄</button>
-                <button onclick="document.getElementById('import-file').click()" style="background: #FF9800; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">📤 導入記錄</button>
-                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importRecords(event)">
-            </div>
-            <div class="form-group">
+                <div class="form-group">
                 <label>選擇月份查看:</label>
                 <select id="month-select" onchange="showMonth()">
                     <option value="">選擇月份</option>
@@ -309,6 +316,7 @@
             const photoFile = document.getElementById('photo').files[0];
             const recordDate = document.getElementById('record-date').value;
             const time = document.getElementById('time').value;
+            const brewTimeOfDay = document.getElementById('brew-time').value;
             const temperature = document.getElementById('temperature').value;
             const ratio = document.getElementById('ratio').value;
             const method = document.getElementById('method').value;
@@ -320,8 +328,8 @@
             if (document.getElementById('flavor-nutty').checked) flavors.push('堅果');
             const notes = document.getElementById('notes').value;
 
-            if (!photoFile || !recordDate || !notes) {
-                alert('請上傳相片、選擇日期並填寫心得！');
+            if (!photoFile || !recordDate) {
+                alert('請上傳相片並選擇日期！');
                 return;
             }
 
@@ -331,7 +339,9 @@
                     id: Date.now(),
                     date: recordDate,
                     photo: e.target.result,
-                    time,
+                        time,
+                    brewTimeOfDay,
+                    brewTimeOfDay,
                     temperature,
                     ratio,
                     method,
@@ -354,6 +364,7 @@
             document.getElementById('photo').value = '';
             document.getElementById('record-date').value = today;
             document.getElementById('time').value = '';
+            document.getElementById('brew-time').value = '';
             document.getElementById('temperature').value = '';
             document.getElementById('ratio').value = '';
             document.getElementById('bean').value = '';
@@ -388,6 +399,7 @@
                         <img src="${r.photo}" alt="咖啡相片">
                         <div class="record-meta">
                             <p><strong>日期:</strong> ${r.date}</p>
+                            ${r.brewTimeOfDay ? `<p><strong>沖煮時刻:</strong> ${r.brewTimeOfDay}</p>` : ''}
                             <p><strong>時間:</strong> ${r.time} 分</p>
                             <p><strong>水溫:</strong> ${r.temperature ? r.temperature + '°C' : '未記錄'}</p>
                             <p><strong>水粉比例:</strong> ${r.ratio || '未記錄'}</p>
@@ -431,7 +443,7 @@
             const record = records.find(r => r.id === id);
             if (record) {
                 const flavorsText = record.flavors && record.flavors.length > 0 ? record.flavors.join('、') : '未選擇';
-                alert(`日期: ${record.date}\n時間: ${record.time} 分鐘\n水溫: ${record.temperature ? record.temperature + '°C' : '未記錄'}\n水粉比例: ${record.ratio || '未記錄'}\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n感官風味: ${flavorsText}\n心得: ${record.notes}`);
+                alert(`日期: ${record.date}${record.brewTimeOfDay ? '\n沖煮時刻: ' + record.brewTimeOfDay : ''}\n時間: ${record.time} 分鐘\n水溫: ${record.temperature ? record.temperature + '°C' : '未記錄'}\n水粉比例: ${record.ratio || '未記錄'}\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n感官風味: ${flavorsText}\n心得: ${record.notes}`);
             }
         }
 
@@ -445,51 +457,7 @@
             }
         }
 
-        function exportRecords() {
-            if (records.length === 0) {
-                alert('暫無記錄可導出！');
-                return;
-            }
-            const dataStr = JSON.stringify(records, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `coffee-records-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            alert('記錄已導出！');
-        }
-
-        function importRecords(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedRecords = JSON.parse(e.target.result);
-                    if (!Array.isArray(importedRecords)) {
-                        alert('無效的文件格式！');
-                        return;
-                    }
-                    
-                    if (confirm('確定要導入這些記錄嗎？現有記錄將被合併。')) {
-                        records = [...importedRecords, ...records];
-                        localStorage.setItem('coffeeRecords', JSON.stringify(records));
-                        updateRecords();
-                        showMonth();
-                        alert('記錄已導入成功！');
-                    }
-                } catch (error) {
-                    alert('導入失敗：文件格式不正確');
-                }
-            };
-            reader.readAsText(file);
-            document.getElementById('import-file').value = '';
-        }
     </script>
+
 </body>
 </html>
