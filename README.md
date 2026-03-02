@@ -1,4 +1,4 @@
-[index (1).html](https://github.com/user-attachments/files/25677973/index.1.html)
+[index (2).html](https://github.com/user-attachments/files/25678255/index.2.html)
 <html lang="zh-HKT">
 <head>
     <meta charset="UTF-8">
@@ -171,6 +171,14 @@
                 <input type="number" id="time" min="1" max="10">
             </div>
             <div class="form-group">
+                <label>水溫 (°C):</label>
+                <input type="number" id="temperature" placeholder="例: 90">
+            </div>
+            <div class="form-group">
+                <label>水粉比例:</label>
+                <input type="text" id="ratio" placeholder="例: 1:15 或 20g:300ml">
+            </div>
+            <div class="form-group">
                 <label>沖煮方式:</label>
                 <select id="method">
                     <option>手沖 (V60)</option>
@@ -195,6 +203,23 @@
             <div class="form-group">
                 <label>咖啡豆產區/名稱:</label>
                 <input type="text" id="bean">
+            </div>
+            <div class="form-group">
+                <label>感官風味:</label>
+                <div style="display: flex; gap: 15px; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="flavor-floral" style="width: auto; margin-right: 5px;">
+                        花香
+                    </label>
+                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="flavor-fruity" style="width: auto; margin-right: 5px;">
+                        果酸
+                    </label>
+                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="flavor-nutty" style="width: auto; margin-right: 5px;">
+                        堅果
+                    </label>
+                </div>
             </div>
             <div class="form-group">
                 <label>心得:</label>
@@ -279,9 +304,15 @@
             const photoFile = document.getElementById('photo').files[0];
             const recordDate = document.getElementById('record-date').value;
             const time = document.getElementById('time').value;
+            const temperature = document.getElementById('temperature').value;
+            const ratio = document.getElementById('ratio').value;
             const method = document.getElementById('method').value;
             const roast = document.getElementById('roast').value;
             const bean = document.getElementById('bean').value;
+            const flavors = [];
+            if (document.getElementById('flavor-floral').checked) flavors.push('花香');
+            if (document.getElementById('flavor-fruity').checked) flavors.push('果酸');
+            if (document.getElementById('flavor-nutty').checked) flavors.push('堅果');
             const notes = document.getElementById('notes').value;
 
             if (!photoFile || !recordDate || !notes) {
@@ -296,9 +327,12 @@
                     date: recordDate,
                     photo: e.target.result,
                     time,
+                    temperature,
+                    ratio,
                     method,
                     roast,
                     bean,
+                    flavors,
                     notes
                 };
                 records.unshift(record);
@@ -315,7 +349,12 @@
             document.getElementById('photo').value = '';
             document.getElementById('record-date').value = today;
             document.getElementById('time').value = '';
+            document.getElementById('temperature').value = '';
+            document.getElementById('ratio').value = '';
             document.getElementById('bean').value = '';
+            document.getElementById('flavor-floral').checked = false;
+            document.getElementById('flavor-fruity').checked = false;
+            document.getElementById('flavor-nutty').checked = false;
             document.getElementById('notes').value = '';
             document.getElementById('preview').style.display = 'none';
         }
@@ -345,9 +384,12 @@
                         <div class="record-meta">
                             <p><strong>日期:</strong> ${r.date}</p>
                             <p><strong>時間:</strong> ${r.time} 分</p>
+                            <p><strong>水溫:</strong> ${r.temperature ? r.temperature + '°C' : '未記錄'}</p>
+                            <p><strong>水粉比例:</strong> ${r.ratio || '未記錄'}</p>
                             <p><strong>方式:</strong> ${r.method}</p>
                             <p><strong>烘焙:</strong> ${r.roast}</p>
                             <p><strong>豆子:</strong> ${r.bean}</p>
+                            <p><strong>感官風味:</strong> ${r.flavors && r.flavors.length > 0 ? r.flavors.join('、') : '未選擇'}</p>
                             <p><strong>心得:</strong> ${r.notes}</p>
                             <button onclick="deleteRecord(${r.id})" style="background: #e74c3c; padding: 5px 10px; margin-top: 10px;">刪除</button>
                         </div>
@@ -383,7 +425,8 @@
         function viewDetail(id) {
             const record = records.find(r => r.id === id);
             if (record) {
-                alert(`日期: ${record.date}\n時間: ${record.time} 分鐘\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n心得: ${record.notes}`);
+                const flavorsText = record.flavors && record.flavors.length > 0 ? record.flavors.join('、') : '未選擇';
+                alert(`日期: ${record.date}\n時間: ${record.time} 分鐘\n水溫: ${record.temperature ? record.temperature + '°C' : '未記錄'}\n水粉比例: ${record.ratio || '未記錄'}\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n感官風味: ${flavorsText}\n心得: ${record.notes}`);
             }
         }
 
