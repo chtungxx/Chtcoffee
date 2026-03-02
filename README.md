@@ -1,4 +1,4 @@
-[20260302.html](https://github.com/user-attachments/files/25680220/20260302.html)
+[2026.html](https://github.com/user-attachments/files/25680344/2026.html)
 <html lang="zh-HKT">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Today's Coffee">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238B4513' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%238B4513' width='180' height='180' rx='40'/><text x='90' y='90' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
-    <link rel="manifest" href="/manifest.json">
+    <!-- manifest removed -->
     <title>오늘커피 ☕️ Today’s Coffee</title>
     <style>
         * {
@@ -299,6 +299,8 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('record-date').value = today;
         document.getElementById('photo').addEventListener('change', previewPhoto);
+        // show saved records if any
+        updateRecords();
 
         function previewPhoto(e) {
             const file = e.target.files[0];
@@ -378,7 +380,9 @@
         function showSection(section) {
             document.querySelectorAll('section').forEach(s => s.style.display = 'none');
             document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            // attempt to highlight corresponding button
+            const btn = document.querySelector(`nav button[onclick="showSection('${section}')"]`);
+            if (btn) btn.classList.add('active');
             if (section === 'record') {
                 document.getElementById('record-section').style.display = 'block';
             } else if (section === 'view') {
