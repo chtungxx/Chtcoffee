@@ -1,177 +1,467 @@
-<!DOCTYPE html>
+[Uploading 2026.3.html…]()
 <html lang="zh-HKT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오늘커피 ☕️ Today’s Coffee v3 - 完整沖煮指令版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#8B4513">
+    <meta name="description" content="咖啡沖煮記錄應用 - 記錄每一杯咖啡的故事">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Today's Coffee">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238B4513' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%238B4513' width='180' height='180' rx='40'/><text x='90' y='90' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
+    <!-- manifest removed -->
+    <title>오늘커피 ☕️ Today’s Coffee</title>
     <style>
-        /* 同 v2 一樣嘅樣式，略... */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Arial', sans-serif; background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; color: #333; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        h1 { text-align: center; color: #6B4E31; margin-bottom: 30px; font-size: 2em; }
-        .tab, .tab-btns, .tab-btn, .form-group, label, input, textarea, select, button, .records-grid, .record-thumb, .guide, .backup-btns { /* v2 樣式同上，保持一致 */ }
-        /* 加多啲指南樣式 */
-        .guide-section { background: #FFF8E7; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
-        .param-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .param-table th, .param-table td { border: 1px solid #E8D5B7; padding: 8px; text-align: left; }
-        .param-table th { background: #E8D5B7; color: #6B4E31; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.9;
+            min-height: 100vh;
+            color: #333;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            z-index: -1;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #6f4e37;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        nav button {
+            padding: 10px 20px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        nav button.active, nav button:hover {
+            background: #A0522D;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button.submit {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+        }
+        button.submit:hover {
+            background: #45a049;
+        }
+        #records {
+            display: none;
+        }
+        .record {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        .record img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 5px;
+        }
+        .record-meta {
+            margin-top: 10px;
+        }
+        .month-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .thumbnail {
+            text-align: center;
+        }
+        .thumbnail img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .guide {
+            display: none;
+        }
+        .steps {
+            list-style-position: inside;
+        }
+        #date-display {
+            font-size: 1.2em;
+            color: #6f4e37;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <header>
+        <h1>오늘커피 ☕️ Today’s Coffee</h1>
+    </header>
+    <nav>
+        <button onclick="showSection('record')">咖啡記錄</button>
+        <button onclick="showSection('view')">查看記錄</button>
+        <button onclick="showSection('methods')">沖煮方法步驟</button>
+    </nav>
     <div class="container">
-        <h1>오늘커피 ☕️<br>Today’s Coffee v3</h1>
-        
-        <div class="tab-btns">
-            <button class="tab-btn active" onclick="showTab('log')">📸 記錄咖啡</button>
-            <button class="tab-btn" onclick="showTab('view')">📋 查看紀錄</button>
-            <button class="tab-btn" onclick="showTab('guide')">☕ 沖煮指南</button>
-        </div>
-
-        <!-- 記錄咖啡 tab - 加水溫同粉水比 -->
-        <div id="log" class="tab active">
-            <form id="coffeeForm">
-                <div class="form-group">
-                    <label>📷 上傳咖啡相片</label>
-                    <input type="file" id="photo" accept="image/*" required>
-                </div>
-                <div class="form-group">
-                    <label>📅 日期</label>
-                    <input type="date" id="date" required>
-                </div>
-                <div class="form-group">
-                    <label>🌡️ 水溫 (°C)</label>
-                    <input type="number" id="temp" min="80" max="100" step="0.5" placeholder="90-92">
-                </div>
-                <div class="form-group">
-                    <label>⚖️ 粉水比</label>
-                    <input type="text" id="ratio" placeholder="1:16">
-                </div>
-                <div class="form-group">
-                    <label>⏱️ 沖煮時間 (分)</label>
-                    <input type="number" id="brewTime" min="1" max="20" step="0.5">
-                </div>
-                <div class="form-group">
-                    <label>☕ 沖煮方式</label>
-                    <select id="method">
-                        <option value="手沖">手沖</option>
-                        <option value="義式">義式</option>
-                        <option value="浸泡">浸泡</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>🌾 烘焙度</label>
-                    <select id="roast">
-                        <option value="淺烘">淺烘 (92°C, 1:16)</option>
-                        <option value="中烘">中烘 (90°C, 1:15)</option>
-                        <option value="深烘">深烘 (88°C, 1:14)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>🌍 咖啡豆</label>
-                    <input type="text" id="bean" placeholder="衣索比亞耶加雪菲">
-                </div>
-                <div class="form-group">
-                    <label>💭 心得</label>
-                    <textarea id="notes" placeholder="酸度、苦澀、回甘..."></textarea>
-                </div>
-                <button type="submit">💾 保存</button>
-            </form>
-            <div class="backup-btns">
-                <button class="backup-btn" onclick="exportData()">💾 匯出</button>
-                <button class="backup-btn" onclick="importData()">📥 匯入</button>
+        <!-- 記錄區 -->
+        <section id="record-section">
+            <h2>今日咖啡記錄</h2>
+            <div class="form-group">
+                <label>上傳相片:</label>
+                <input type="file" id="photo" accept="image/*">
+                <img id="preview" style="max-width: 300px; margin-top: 10px; display: none;">
             </div>
-        </div>
-
-        <!-- 查看紀錄 tab - 同 v2 -->
-        <div id="view" class="tab">
-            <div id="recordsList"></div>
-        </div>
-
-        <!-- 沖煮指南 tab - 加你圖片指令 -->
-        <div id="guide" class="tab">
-            <div class="guide-section">
-                <h3>🌊 手沖咖啡 (1:15-1:17)</h3>
-                <p><strong>水溫：90-92°C</strong> [web:5][web:6]</p>
-                <table class="param-table">
-                    <tr><th>階段</th><th>比例</th><th>注水方式</th></tr>
-                    <tr><td>第一階段</td><td>40%</td><td>悶蒸 30秒，輕攪</td></tr>
-                    <tr><td>第二階段</td><td>30%</td><td>畫圈注入</td></tr>
-                    <tr><td>第三階段</td><td>20%</td><td>繼續畫圈</td></tr>
-                    <tr><td>第四階段</td><td>10%</td><td>滴濾完成 (總時 2-3分)</td></tr>
-                </table>
-                <p>烘焙配對：淺烘 92°C 1:16，中烘 90°C 1:15 [web:9]</p>
+            <div class="form-group">
+                <label>選擇日期:</label>
+                <input type="date" id="record-date">
             </div>
-            <div class="guide-section">
-                <h3>☕ 義式濃縮 (1:2-1:3)</h3>
-                <p><strong>水溫：90-93°C，壓力 9 bar，時間 25-35秒</strong> [web:11][web:17]</p>
-                <table class="param-table">
-                    <tr><th>類型</th><th>粉:液 比例</th><th>粉量</th></tr>
-                    <tr><td>Ristretto</td><td>1:1-1:2</td><td>18g → 25-36g</td></tr>
-                    <tr><td>Normale</td><td>1:2-1:3</td><td>18g → 36-54g</td></tr>
-                    <tr><td>Lungo</td><td>1:3-1:4</td><td>18g → 54-72g</td></tr>
-                </table>
+            <div class="form-group">
+                <label>沖煮時間（時:分，可選）:</label>
+                <input type="time" id="brew-time">
             </div>
-            <div class="guide-section">
-                <h3>🌾 烘焙度參考</h3>
-                <p>淺烘 (Agtron 80+)：92°C，高酸；中烘 (60-79)：90°C，平衡；深烘 (<60)：88°C，醇厚 [web:10][web:16]</p>
+            <div class="form-group">
+                <label>沖煮時間 (分鐘):</label>
+                <input type="number" id="time" min="1" max="10">
             </div>
-        </div>
-    </div>
+            <div class="form-group">
+                <label>水溫 (°C):</label>
+                <input type="number" id="temperature" placeholder="例: 90">
+            </div>
+            <div class="form-group">
+                <label>水粉比例:</label>
+                <input type="text" id="ratio" placeholder="例: 1:15 或 20g:300ml">
+            </div>
+            <div class="form-group">
+                <label>沖煮方式:</label>
+                <select id="method">
+                    <option>手沖 (V60)</option>
+                    <option>手沖 (Chemex)</option>
+                    <option>手沖 (Kalita Wave)</option>
+                    <option>意式咖啡 (Espresso)</option>
+                    <option>French Press</option>
+                    <option>Cold Brew</option>
+                    <option>Moka Pot</option>
+                    <option>Turkish Coffee</option>
+                    <option>其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>咖啡豆烘焙度:</label>
+                <select id="roast">
+                    <option>淺焙</option>
+                    <option>中焙</option>
+                    <option>深焙</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>咖啡豆產區/名稱:</label>
+                <input type="text" id="bean">
+            </div>
+            <div class="form-group">
+                <label>感官風味:</label>
+                <div style="display: flex; gap: 15px; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="flavor-floral" style="width: auto; margin-right: 5px;">
+                        花香
+                    </label>
+                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="flavor-fruity" style="width: auto; margin-right: 5px;">
+                        果酸
+                    </label>
+                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="flavor-nutty" style="width: auto; margin-right: 5px;">
+                        堅果
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>心得:</label>
+                <textarea id="notes" placeholder="分享你的沖煮心得..."></textarea>
+            </div>
+            <button class="submit" onclick="saveRecord()">儲存記錄</button>
+        </section>
 
-    <!-- 詳情彈窗 同 v2 -->
-    <div id="detailModal">
-        <img id="detailImg" src="" onclick="closeModal()">
+        <!-- 沖煮方法步驟區 -->
+        <section id="methods-section" style="display: none;">
+            <h2>沖煮方法步驟</h2>
+            
+            <h3>一刀流沖煮法</h3>
+            <p><strong>推薦比例:</strong> 1:15 至 1:17 (咖啡:水)</p>
+            <p><strong>水溫:</strong> 90-92°C</p>
+            <ol class="steps">
+                <li>將咖啡粉放入濾杯，倒入濾紙。</li>
+                <li>進行悶蒸 (Bloom)：倒入 2x 咖啡重量的水，靜置 40-45 秒。</li>
+                <li>開始注水：以穩定的流速，一次性持續注水至達到目標總水量。</li>
+                <li>保持穩定的注水流速，不中斷，直到所有水都通過咖啡粉。</li>
+                <li>總萃取時間約 2.5-3 分鐘。</li>
+                <li>享受您的咖啡！</li>
+            </ol>
+            
+            <h3>四六沖法</h3>
+            <p><strong>推薦比例:</strong> 1:16 (咖啡:水)</p>
+            <p><strong>水溫:</strong> 92-94°C</p>
+            <p><strong>說明:</strong> 分為四個階段，第一階段 (40%)、第二階段 (30%)、第三階段 (20%)、第四階段 (10%) 的注水方式</p>
+            <ol class="steps">
+                <li>進行悶蒸：倒入 2x 咖啡重量的水，靜置 45-50 秒。</li>
+                <li><strong>第一階段 (40%):</strong> 注入 40% 的總水量，用小圓圈注水方式，時間約 50 秒。</li>
+                <li>等待 30 秒，讓咖啡粉充分浸泡。</li>
+                <li><strong>第二階段 (30%):</strong> 注入 30% 的總水量，繼續用小圓圈注水，時間約 40 秒。</li>
+                <li>等待 20 秒。</li>
+                <li><strong>第三階段 (20%):</strong> 注入 20% 的總水量，時間約 30 秒。</li>
+                <li>等待 15 秒。</li>
+                <li><strong>第四階段 (10%):</strong> 注入最後 10% 的水量，完成萃取。</li>
+                <li>總萃取時間約 3-3.5 分鐘。</li>
+                <li>享受層次豐富的咖啡風味！</li>
+            </ol>
+        </section>
+
+        <!-- 查看記錄區 -->
+        <section id="view-section" style="display: none;">
+            <h2>查看記錄</h2>
+                <div class="form-group">
+                <label>選擇月份查看:</label>
+                <select id="month-select" onchange="showMonth()">
+                    <option value="">選擇月份</option>
+                </select>
+            </div>
+            <div id="month-view" class="month-view"></div>
+            
+            <h3 style="margin-top: 30px;">所有記錄</h3>
+            <div id="single-records"></div>
+        </section>
+
+        <!-- 指南區 -->
+        <section id="guide-section" style="display: none;">
+        </section>
     </div>
 
     <script>
-        /* v2 所有 JS 功能完全保留，包括壓縮、localStorage、備份、檢視等 */
         let records = JSON.parse(localStorage.getItem('coffeeRecords')) || [];
-        
-        // 初始化 + 填新欄位默認值
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('temp').value = '91';
-        document.getElementById('ratio').value = '1:16';
-        document.getElementById('roast').value = '中烘';
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('record-date').value = today;
+        document.getElementById('photo').addEventListener('change', previewPhoto);
+        // show saved records if any
+        updateRecords();
 
-        // form submit 加新欄位
-        document.getElementById('coffeeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const photoFile = document.getElementById('photo').files[0];
-            if (!photoFile) return alert('請選相片！');
-            
-            const compressedImg = await compressImage(photoFile); // v2 壓縮函數
-            
-            const record = {
-                id: Date.now(),
-                date: document.getElementById('date').value,
-                temp: document.getElementById('temp').value,
-                ratio: document.getElementById('ratio').value,
-                photo: compressedImg,
-                brewTime: document.getElementById('brewTime').value,
-                method: document.getElementById('method').value,
-                roast: document.getElementById('roast').value,
-                bean: document.getElementById('bean').value,
-                notes: document.getElementById('notes').value
-            };
-            
-            records.unshift(record);
-            localStorage.setItem('coffeeRecords', JSON.stringify(records));
-            alert('✅ 保存成功！新版有水溫／比例記錄～');
-            document.getElementById('coffeeForm').reset();
-            document.getElementById('date').valueAsDate = new Date();
-        });
-
-        // 其他函數同 v2 一樣：showTab, compressImage, loadRecords, viewDetail, exportData, importData, closeModal
-        // ... (copy v2 所有剩餘 JS)
-        
-        function showTab(tabName) {
-            // v2 tab 邏輯
+        function previewPhoto(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    document.getElementById('preview').src = ev.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
         }
-        // 壓縮、載入、彈窗等全 copy v2
-        
-        // 自動載入紀錄
-        loadRecords();
+
+        function saveRecord() {
+            const photoFile = document.getElementById('photo').files[0];
+            const recordDate = document.getElementById('record-date').value;
+            const time = document.getElementById('time').value;
+            const brewTimeOfDay = document.getElementById('brew-time').value;
+            const temperature = document.getElementById('temperature').value;
+            const ratio = document.getElementById('ratio').value;
+            const method = document.getElementById('method').value;
+            const roast = document.getElementById('roast').value;
+            const bean = document.getElementById('bean').value;
+            const flavors = [];
+            if (document.getElementById('flavor-floral').checked) flavors.push('花香');
+            if (document.getElementById('flavor-fruity').checked) flavors.push('果酸');
+            if (document.getElementById('flavor-nutty').checked) flavors.push('堅果');
+            const notes = document.getElementById('notes').value;
+
+            if (!photoFile || !recordDate) {
+                alert('請上傳相片並選擇日期！');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const record = {
+                    id: Date.now(),
+                    date: recordDate,
+                    photo: e.target.result,
+                        time,
+                    brewTimeOfDay,
+                    brewTimeOfDay,
+                    temperature,
+                    ratio,
+                    method,
+                    roast,
+                    bean,
+                    flavors,
+                    notes
+                };
+                records.unshift(record);
+                localStorage.setItem('coffeeRecords', JSON.stringify(records));
+                alert('記錄已儲存！');
+                clearForm();
+                showSection('view');
+                updateRecords();
+            };
+            reader.readAsDataURL(photoFile);
+        }
+
+        function clearForm() {
+            document.getElementById('photo').value = '';
+            document.getElementById('record-date').value = today;
+            document.getElementById('time').value = '';
+            document.getElementById('brew-time').value = '';
+            document.getElementById('temperature').value = '';
+            document.getElementById('ratio').value = '';
+            document.getElementById('bean').value = '';
+            document.getElementById('flavor-floral').checked = false;
+            document.getElementById('flavor-fruity').checked = false;
+            document.getElementById('flavor-nutty').checked = false;
+            document.getElementById('notes').value = '';
+            document.getElementById('preview').style.display = 'none';
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            // attempt to highlight corresponding button
+            const btn = document.querySelector(`nav button[onclick="showSection('${section}')"]`);
+            if (btn) btn.classList.add('active');
+            if (section === 'record') {
+                document.getElementById('record-section').style.display = 'block';
+            } else if (section === 'view') {
+                document.getElementById('view-section').style.display = 'block';
+                updateRecords();
+            } else if (section === 'methods') {
+                document.getElementById('methods-section').style.display = 'block';
+            }
+        }
+
+        function updateRecords() {
+            const singleDiv = document.getElementById('single-records');
+            if (records.length === 0) {
+                singleDiv.innerHTML = '<p style="color: #999;">暫沒有記錄，開始紀錄你的咖啡故事吧！</p>';
+            } else {
+                singleDiv.innerHTML = records.map(r => `
+                    <div class="record">
+                        <img src="${r.photo}" alt="咖啡相片">
+                        <div class="record-meta">
+                            <p><strong>日期:</strong> ${r.date}</p>
+                            ${r.brewTimeOfDay ? `<p><strong>沖煮時刻:</strong> ${r.brewTimeOfDay}</p>` : ''}
+                            <p><strong>時間:</strong> ${r.time} 分</p>
+                            <p><strong>水溫:</strong> ${r.temperature ? r.temperature + '°C' : '未記錄'}</p>
+                            <p><strong>水粉比例:</strong> ${r.ratio || '未記錄'}</p>
+                            <p><strong>方式:</strong> ${r.method}</p>
+                            <p><strong>烘焙:</strong> ${r.roast}</p>
+                            <p><strong>豆子:</strong> ${r.bean}</p>
+                            <p><strong>感官風味:</strong> ${r.flavors && r.flavors.length > 0 ? r.flavors.join('、') : '未選擇'}</p>
+                            <p><strong>心得:</strong> ${r.notes}</p>
+                            <button onclick="deleteRecord(${r.id})" style="background: #e74c3c; padding: 5px 10px; margin-top: 10px;">刪除</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const months = [...new Set(records.map(r => r.date.slice(0,7)))].sort().reverse();
+            const select = document.getElementById('month-select');
+            select.innerHTML = '<option value="">選擇月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
+        }
+
+        function showMonth() {
+            const month = document.getElementById('month-select').value;
+            const monthDiv = document.getElementById('month-view');
+            if (!month) {
+                monthDiv.innerHTML = '';
+                return;
+            }
+            const monthRecords = records.filter(r => r.date.startsWith(month));
+            if (monthRecords.length === 0) {
+                monthDiv.innerHTML = '<p style="color: #999;">該月份暫無記錄</p>';
+            } else {
+                monthDiv.innerHTML = monthRecords.map(r => `
+                    <div class="thumbnail">
+                        <img src="${r.photo}" onclick="viewDetail(${r.id})" title="${r.notes.substring(0,50)}...">
+                        <p>${r.date.slice(8)} 日</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function viewDetail(id) {
+            const record = records.find(r => r.id === id);
+            if (record) {
+                const flavorsText = record.flavors && record.flavors.length > 0 ? record.flavors.join('、') : '未選擇';
+                alert(`日期: ${record.date}${record.brewTimeOfDay ? '\n沖煮時刻: ' + record.brewTimeOfDay : ''}\n時間: ${record.time} 分鐘\n水溫: ${record.temperature ? record.temperature + '°C' : '未記錄'}\n水粉比例: ${record.ratio || '未記錄'}\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n感官風味: ${flavorsText}\n心得: ${record.notes}`);
+            }
+        }
+
+        function deleteRecord(id) {
+            if (confirm('確定要刪除這筆記錄嗎？')) {
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem('coffeeRecords', JSON.stringify(records));
+                updateRecords();
+                showMonth();
+                alert('記錄已刪除！');
+            }
+        }
+
     </script>
+
 </body>
 </html>
