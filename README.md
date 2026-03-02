@@ -1,352 +1,261 @@
+[Index.html](https://github.com/user-attachments/files/25677399/Index.html)
 <!DOCTYPE html>
-<html lang="zh-HKT">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오늘커피 ☕️ Today’s Coffee</title>
+    <title>오늘커피 ☕️ Today’s coffee</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --main-brown: #5D4037;
+            --glass-bg: rgba(255, 255, 255, 0.6); /* 控制整體容器透明度 */
         }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            /* 海邊咖啡店背景圖 */
+            background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), 
+                        url('https://images.unsplash.com');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            opacity: 0.9;
-            min-height: 100vh;
-            color: #333;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.6);
-            z-index: -1;
-        }
-        header {
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 2.5em;
-            color: #6f4e37;
-        }
-        nav {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        nav button {
-            padding: 10px 20px;
-            background: #8B4513;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        nav button.active, nav button:hover {
-            background: #A0522D;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
+
+        .container {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
+            max-width: 500px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px); /* 毛玻璃效果 */
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
-        textarea {
-            height: 100px;
-            resize: vertical;
+
+        header { text-align: center; margin-bottom: 25px; }
+        h1 { color: var(--main-brown); margin: 0; font-size: 28px; }
+        h2 { font-size: 18px; color: #777; margin-top: 5px; }
+
+        /* 表單樣式 */
+        .section-title { border-left: 4px solid var(--main-brown); padding-left: 10px; margin: 25px 0 15px; color: var(--main-brown); }
+        
+        .input-group { background: rgba(255,255,255,0.8); padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        
+        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; margin-bottom: 15px; 
+            border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box;
+            font-size: 15px;
         }
-        button.submit {
-            background: #4CAF50;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            width: 100%;
+
+        #preview-container { 
+            width: 100%; height: 200px; background: #eee; border-radius: 10px; 
+            margin-bottom: 15px; overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-        button.submit:hover {
-            background: #45a049;
+        #preview-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        .btn-save { 
+            background: var(--main-brown); color: white; border: none; 
+            padding: 15px; width: 100%; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: bold;
         }
-        #records {
-            display: none;
+
+        /* 歷史檢視與縮圖 */
+        .month-block { margin-top: 20px; }
+        .month-label { font-weight: bold; background: var(--main-brown); color: white; padding: 4px 12px; border-radius: 15px; font-size: 13px; display: inline-block; margin-bottom: 10px; }
+        
+        .history-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .history-item { 
+            aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; cursor: pointer; 
+            border: 2px solid white; transition: transform 0.2s;
         }
-        .record {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: white;
+        .history-item:hover { transform: scale(1.05); }
+        .history-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 指南樣式 */
+        .guide-box { background: rgba(111, 78, 55, 0.1); padding: 15px; border-radius: 15px; font-size: 14px; line-height: 1.6; }
+
+        /* 詳細資料彈窗 */
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; max-width: 400px; background: white; padding: 25px; border-radius: 20px; z-index: 100;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
         }
-        .record img {
-            max-width: 200px;
-            height: auto;
-            border-radius: 5px;
-        }
-        .record-meta {
-            margin-top: 10px;
-        }
-        .month-view {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        .thumbnail {
-            text-align: center;
-        }
-        .thumbnail img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .guide {
-            display: none;
-        }
-        .steps {
-            list-style-position: inside;
-        }
-        #date-display {
-            font-size: 1.2em;
-            color: #6f4e37;
-            font-weight: bold;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; }
     </style>
 </head>
 <body>
+
+<div class="container">
     <header>
-        <h1>오늘커피 ☕️ Today’s Coffee</h1>
+        <h1>오늘커피 ☕️</h1>
+        <h2>Today’s coffee</h2>
     </header>
-    <nav>
-        <button onclick="showSection('record')">咖啡記錄</button>
-        <button onclick="showSection('view')">查看記錄</button>
-        <button onclick="showSection('guide')">手沖指南</button>
-    </nav>
-    <div class="container">
-        <!-- 記錄區 -->
-        <section id="record-section">
-            <h2>今日咖啡記錄</h2>
-            <div class="form-group">
-                <label>上傳相片:</label>
-                <input type="file" id="photo" accept="image/*">
-                <img id="preview" style="max-width: 300px; margin-top: 10px; display: none;">
-            </div>
-            <div class="form-group">
-                <label>今日日期:</label>
-                <div id="date-display"></div>
-            </div>
-            <div class="form-group">
-                <label>沖煮時間 (分鐘):</label>
-                <input type="number" id="time" min="1" max="10">
-            </div>
-            <div class="form-group">
-                <label>沖煮方式:</label>
-                <select id="method">
-                    <option>手沖 (V60)</option>
-                    <option>手沖 (Chemex)</option>
-                    <option>其他</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>咖啡豆烘焙度:</label>
-                <select id="roast">
+
+    <!-- 1. 紀錄功能 -->
+    <div class="input-group">
+        <label>📸 上傳今日咖啡相片</label>
+        <input type="file" accept="image/*" onchange="previewImage(this)">
+        <div id="preview-container">
+            <span id="placeholder-text" style="color:#aaa">尚未選擇相片</span>
+            <img id="preview-img">
+        </div>
+
+        <label>📅 日期</label>
+        <input type="date" id="date-input">
+
+        <label>📍 產區 / 豆名 (選填)</label>
+        <input type="text" id="bean-name" placeholder="例如：埃塞俄比亞 谷吉">
+
+        <div style="display: flex; gap: 10px;">
+            <div style="flex:1">
+                <label>🔥 烘焙度</label>
+                <select id="roast-level">
                     <option>淺焙</option>
                     <option>中焙</option>
                     <option>深焙</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>咖啡豆產區/名稱:</label>
-                <input type="text" id="bean">
+            <div style="flex:1">
+                <label>⏱ 沖煮時間</label>
+                <input type="text" id="brew-time" placeholder="2:30">
             </div>
-            <div class="form-group">
-                <label>心得:</label>
-                <textarea id="notes" placeholder="分享你的沖煮心得..."></textarea>
-            </div>
-            <button class="submit" onclick="saveRecord()">儲存記錄</button>
-        </section>
+        </div>
 
-        <!-- 查看記錄區 -->
-        <section id="view-section" style="display: none;">
-            <h2>個人記錄</h2>
-            <div id="single-records"></div>
-            <h3>月曆檢視</h3>
-            <select id="month-select" onchange="showMonth()">
-                <option value="">選擇月份</option>
-            </select>
-            <div id="month-view" class="month-view"></div>
-        </section>
+        <label>💡 沖煮心得</label>
+        <textarea id="brew-note" rows="3" placeholder="今天的口感如何？"></textarea>
 
-        <!-- 指南區 -->
-        <section id="guide-section" style="display: none;">
-            <h2>手沖咖啡指南</h2>
-            <p>推薦比例: 1:17 (咖啡:水，例如 20g 咖啡 + 340g 水) [web:11][page:0]</p>
-            <h3>V60 手沖步驟 [page:1]</h3>
-            <ol class="steps">
-                <li>水溫約 93°C (200°F)。</li>
-                <li>咖啡磨成海鹽粗細，放入濾紙。</li>
-                <li>Bloom: 倒 2x 咖啡重量的水 (e.g. 40g)，等 40 秒。</li>
-                <li>分次注水: 總水 350g，分 3-4 次螺旋注水，總時間 2-3 分鐘。</li>
-                <li>完成後享用！</li>
-            </ol>
-            <h3>比例建議</h3>
-            <ul>
-                <li>淺焙: 1:16 較強烈。</li>
-                <li>中深焙: 1:17 平衡 [web:11][web:12]。</li>
-            </ul>
-        </section>
+        <button class="btn-save" onclick="saveRecord()">儲存今日紀錄</button>
     </div>
 
-    <script>
-        let records = JSON.parse(localStorage.getItem('coffeeRecords')) || [];
-        let currentDate = new Date().toISOString().split('T')[0];
+    <!-- 2. 手沖指南 -->
+    <div class="section-title">手沖指南 Pourover Guide</div>
+    <div class="guide-box">
+        <strong>黃金比例：1:15</strong> (例如 20g 粉對 300ml 水)<br>
+        <strong>步驟說明：</strong><br>
+        1. 悶蒸：注入 40g 水，靜置 30 秒。<br>
+        2. 第一段：中心繞圈注入至 150g。<br>
+        3. 第二段：緩慢注水至 300g，等待濾乾。<br>
+        4. 總時長：建議在 2'15" - 2'45" 之間。
+    </div>
 
-        document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-TW');
-        document.getElementById('photo').addEventListener('change', previewPhoto);
+    <!-- 3. 按月檢視 -->
+    <div class="section-title">歷史紀錄回顧</div>
+    <div id="history-list">
+        <!-- 紀錄會顯示在這裡 -->
+    </div>
+</div>
 
-        function previewPhoto(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    document.getElementById('preview').src = ev.target.result;
-                    document.getElementById('preview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+<!-- 彈出詳細資料 -->
+<div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal" id="detail-modal">
+    <h3 id="modal-date" style="margin-top:0; color:var(--main-brown);"></h3>
+    <img id="modal-img" style="width:100%; border-radius:10px; margin-bottom:15px;">
+    <div id="modal-body" style="font-size: 14px; line-height: 1.8;"></div>
+    <button class="btn-save" style="margin-top:20px;" onclick="closeModal()">關閉</button>
+</div>
 
-        function saveRecord() {
-            const photoFile = document.getElementById('photo').files[0];
-            const time = document.getElementById('time').value;
-            const method = document.getElementById('method').value;
-            const roast = document.getElementById('roast').value;
-            const bean = document.getElementById('bean').value;
-            const notes = document.getElementById('notes').value;
+<script>
+    let uploadedImageBase64 = "";
 
-            if (!photoFile || !notes) {
-                alert('請上傳相片並填寫心得！');
-                return;
-            }
+    // 頁面加載時：設定預設日期、讀取紀錄
+    window.onload = () => {
+        document.getElementById('date-input').valueAsDate = new Date();
+        loadHistory();
+    };
 
+    // 處理圖片預覽
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const record = {
-                    id: Date.now(),
-                    date: currentDate,
-                    photo: e.target.result,
-                    time,
-                    method,
-                    roast,
-                    bean,
-                    notes
-                };
-                records.unshift(record);
-                localStorage.setItem('coffeeRecords', JSON.stringify(records));
-                alert('記錄已儲存！');
-                clearForm();
-                showSection('view');
-                updateRecords();
+            reader.onload = (e) => {
+                uploadedImageBase64 = e.target.result;
+                document.getElementById('preview-img').src = uploadedImageBase64;
+                document.getElementById('preview-img').style.display = 'block';
+                document.getElementById('placeholder-text').style.display = 'none';
             };
-            reader.readAsDataURL(photoFile);
+            reader.readAsDataURL(input.files[0]);
         }
+    }
 
-        function clearForm() {
-            document.getElementById('photo').value = '';
-            document.getElementById('time').value = '';
-            document.getElementById('bean').value = '';
-            document.getElementById('notes').value = '';
-            document.getElementById('preview').style.display = 'none';
+    // 儲存紀錄
+    function saveRecord() {
+        const record = {
+            id: Date.now(),
+            date: document.getElementById('date-input').value,
+            bean: document.getElementById('bean-name').value || "未命名豆子",
+            roast: document.getElementById('roast-level').value,
+            time: document.getElementById('brew-time').value,
+            note: document.getElementById('brew-note').value,
+            img: uploadedImageBase64 || "https://via.placeholder.com"
+        };
+
+        const history = JSON.parse(localStorage.getItem('coffee_history') || '[]');
+        history.unshift(record);
+        localStorage.setItem('coffee_history', JSON.stringify(history));
+
+        alert("紀錄成功！");
+        location.reload();
+    }
+
+    // 載入歷史紀錄並按月分組
+    function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('coffee_history') || '[]');
+        const container = document.getElementById('history-list');
+        const groups = {};
+
+        // 按月份分組 (YYYY-MM)
+        history.forEach(item => {
+            const month = item.date.substring(0, 7);
+            if (!groups[month]) groups[month] = [];
+            groups[month].push(item);
+        });
+
+        for (const month in groups) {
+            const monthDiv = document.createElement('div');
+            monthDiv.className = 'month-block';
+            monthDiv.innerHTML = `<div class="month-label">${month}</div>`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'history-grid';
+            
+            groups[month].forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'history-item';
+                el.innerHTML = `<img src="${item.img}">`;
+                el.onclick = () => showDetail(item);
+                grid.appendChild(el);
+            });
+
+            monthDiv.appendChild(grid);
+            container.appendChild(monthDiv);
         }
+    }
 
-        function showSection(section) {
-            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            if (section === 'record') {
-                document.getElementById('record-section').style.display = 'block';
-            } else if (section === 'view') {
-                document.getElementById('view-section').style.display = 'block';
-                updateRecords();
-            } else if (section === 'guide') {
-                document.getElementById('guide-section').style.display = 'block';
-            }
-        }
+    // 顯示詳細資訊
+    function showDetail(item) {
+        document.getElementById('modal-date').innerText = item.date + " 紀錄";
+        document.getElementById('modal-img').src = item.img;
+        document.getElementById('modal-body').innerHTML = `
+            <strong>豆子：</strong> ${item.bean} <br>
+            <strong>烘焙：</strong> ${item.roast} <br>
+            <strong>時間：</strong> ${item.time} <br>
+            <strong>心得：</strong> ${item.note || "無"}
+        `;
+        document.getElementById('detail-modal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    }
 
-        function updateRecords() {
-            const singleDiv = document.getElementById('single-records');
-            singleDiv.innerHTML = records.map(r => `
-                <div class="record">
-                    <img src="${r.photo}" alt="咖啡相片">
-                    <div class="record-meta">
-                        <p><strong>日期:</strong> ${r.date}</p>
-                        <p><strong>時間:</strong> ${r.time} 分</p>
-                        <p><strong>方式:</strong> ${r.method}</p>
-                        <p><strong>烘焙:</strong> ${r.roast}</p>
-                        <p><strong>豆子:</strong> ${r.bean}</p>
-                        <p><strong>心得:</strong> ${r.notes}</p>
-                    </div>
-                </div>
-            `).join('');
+    function closeModal() {
+        document.getElementById('detail-modal').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+    }
+</script>
 
-            const months = [...new Set(records.map(r => r.date.slice(0,7)))];
-            const select = document.getElementById('month-select');
-            select.innerHTML = '<option value="">選擇月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
-        }
-
-        function showMonth() {
-            const month = document.getElementById('month-select').value;
-            const monthDiv = document.getElementById('month-view');
-            if (!month) {
-                monthDiv.innerHTML = '';
-                return;
-            }
-            const monthRecords = records.filter(r => r.date.startsWith(month));
-            monthDiv.innerHTML = monthRecords.map(r => `
-                <div class="thumbnail">
-                    <img src="${r.photo}" onclick="viewDetail(${r.id})" title="${r.notes.substring(0,50)}...">
-                    <p>${r.date.slice(8)}</p>
-                </div>
-            `).join('');
-        }
-
-        function viewDetail(id) {
-            const record = records.find(r => r.id === id);
-            if (record) {
-                alert(`日期: ${record.date}\n心得: ${record.notes}`);
-            }
-        }
-    </script>
 </body>
 </html>
