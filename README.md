@@ -1,4 +1,4 @@
-[index (2).html](https://github.com/user-attachments/files/25678255/index.2.html)
+[index (3).html](https://github.com/user-attachments/files/25678722/index.3.html)
 <html lang="zh-HKT">
 <head>
     <meta charset="UTF-8">
@@ -265,6 +265,11 @@
         <!-- 查看記錄區 -->
         <section id="view-section" style="display: none;">
             <h2>查看記錄</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button onclick="exportRecords()" style="background: #2196F3; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">📥 導出記錄</button>
+                <button onclick="document.getElementById('import-file').click()" style="background: #FF9800; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">📤 導入記錄</button>
+                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importRecords(event)">
+            </div>
             <div class="form-group">
                 <label>選擇月份查看:</label>
                 <select id="month-select" onchange="showMonth()">
@@ -438,6 +443,52 @@
                 showMonth();
                 alert('記錄已刪除！');
             }
+        }
+
+        function exportRecords() {
+            if (records.length === 0) {
+                alert('暫無記錄可導出！');
+                return;
+            }
+            const dataStr = JSON.stringify(records, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `coffee-records-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            alert('記錄已導出！');
+        }
+
+        function importRecords(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedRecords = JSON.parse(e.target.result);
+                    if (!Array.isArray(importedRecords)) {
+                        alert('無效的文件格式！');
+                        return;
+                    }
+                    
+                    if (confirm('確定要導入這些記錄嗎？現有記錄將被合併。')) {
+                        records = [...importedRecords, ...records];
+                        localStorage.setItem('coffeeRecords', JSON.stringify(records));
+                        updateRecords();
+                        showMonth();
+                        alert('記錄已導入成功！');
+                    }
+                } catch (error) {
+                    alert('導入失敗：文件格式不正確');
+                }
+            };
+            reader.readAsText(file);
+            document.getElementById('import-file').value = '';
         }
     </script>
 </body>
