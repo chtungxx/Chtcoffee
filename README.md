@@ -1,467 +1,428 @@
-[Uploading 2026.3.html…]()
-<html lang="zh-HKT">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#8B4513">
-    <meta name="description" content="咖啡沖煮記錄應用 - 記錄每一杯咖啡的故事">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Today's Coffee">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238B4513' width='192' height='192'/><text x='50%' y='50%' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%238B4513' width='180' height='180' rx='40'/><text x='90' y='90' font-size='80' fill='%23fff' text-anchor='middle' dominant-baseline='central'>☕</text></svg>">
-    <!-- manifest removed -->
-    <title>오늘커피 ☕️ Today’s Coffee</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            opacity: 0.9;
-            min-height: 100vh;
-            color: #333;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.6);
-            z-index: -1;
-        }
-        header {
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 2.5em;
-            color: #6f4e37;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        nav button {
-            padding: 10px 20px;
-            background: #8B4513;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        nav button.active, nav button:hover {
-            background: #A0522D;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        textarea {
-            height: 100px;
-            resize: vertical;
-        }
-        button.submit {
-            background: #4CAF50;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            width: 100%;
-        }
-        button.submit:hover {
-            background: #45a049;
-        }
-        #records {
-            display: none;
-        }
-        .record {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: white;
-        }
-        .record img {
-            max-width: 200px;
-            height: auto;
-            border-radius: 5px;
-        }
-        .record-meta {
-            margin-top: 10px;
-        }
-        .month-view {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        .thumbnail {
-            text-align: center;
-        }
-        .thumbnail img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .guide {
-            display: none;
-        }
-        .steps {
-            list-style-position: inside;
-        }
-        #date-display {
-            font-size: 1.2em;
-            color: #6f4e37;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>오늘커피 ☕️ Today’s Coffee</h1>
-    </header>
-    <nav>
-        <button onclick="showSection('record')">咖啡記錄</button>
-        <button onclick="showSection('view')">查看記錄</button>
-        <button onclick="showSection('methods')">沖煮方法步驟</button>
-    </nav>
-    <div class="container">
-        <!-- 記錄區 -->
-        <section id="record-section">
-            <h2>今日咖啡記錄</h2>
-            <div class="form-group">
-                <label>上傳相片:</label>
-                <input type="file" id="photo" accept="image/*">
-                <img id="preview" style="max-width: 300px; margin-top: 10px; display: none;">
-            </div>
-            <div class="form-group">
-                <label>選擇日期:</label>
-                <input type="date" id="record-date">
-            </div>
-            <div class="form-group">
-                <label>沖煮時間（時:分，可選）:</label>
-                <input type="time" id="brew-time">
-            </div>
-            <div class="form-group">
-                <label>沖煮時間 (分鐘):</label>
-                <input type="number" id="time" min="1" max="10">
-            </div>
-            <div class="form-group">
-                <label>水溫 (°C):</label>
-                <input type="number" id="temperature" placeholder="例: 90">
-            </div>
-            <div class="form-group">
-                <label>水粉比例:</label>
-                <input type="text" id="ratio" placeholder="例: 1:15 或 20g:300ml">
-            </div>
-            <div class="form-group">
-                <label>沖煮方式:</label>
-                <select id="method">
-                    <option>手沖 (V60)</option>
-                    <option>手沖 (Chemex)</option>
-                    <option>手沖 (Kalita Wave)</option>
-                    <option>意式咖啡 (Espresso)</option>
-                    <option>French Press</option>
-                    <option>Cold Brew</option>
-                    <option>Moka Pot</option>
-                    <option>Turkish Coffee</option>
-                    <option>其他</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>咖啡豆烘焙度:</label>
-                <select id="roast">
-                    <option>淺焙</option>
-                    <option>中焙</option>
-                    <option>深焙</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>咖啡豆產區/名稱:</label>
-                <input type="text" id="bean">
-            </div>
-            <div class="form-group">
-                <label>感官風味:</label>
-                <div style="display: flex; gap: 15px; margin-top: 8px;">
-                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
-                        <input type="checkbox" id="flavor-floral" style="width: auto; margin-right: 5px;">
-                        花香
-                    </label>
-                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
-                        <input type="checkbox" id="flavor-fruity" style="width: auto; margin-right: 5px;">
-                        果酸
-                    </label>
-                    <label style="display: flex; align-items: center; font-weight: normal; margin: 0;">
-                        <input type="checkbox" id="flavor-nutty" style="width: auto; margin-right: 5px;">
-                        堅果
-                    </label>
+import React, { useState, useEffect, useMemo } from 'react';
+import { Camera, Calendar, BookOpen, PlusCircle, Clock, Coffee, MapPin, ClipboardList, ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
+
+// 主程式組件
+export default function App() {
+  const [view, setView] = useState('add'); // 'add', 'history', 'guide'
+  const [records, setRecords] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [detailRecord, setDetailRecord] = useState(null);
+
+  // 初始化今日日期
+  const getTodayStr = () => new Date().toISOString().split('T')[0];
+
+  // 表單狀態
+  const [formData, setFormData] = useState({
+    date: getTodayStr(),
+    photo: null,
+    brewTime: '',
+    brewMethod: 'V60',
+    roastLevel: '淺烘焙',
+    origin: '',
+    notes: ''
+  });
+
+  // 處理相片上傳
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, photo: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 儲存紀錄
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newRecord = {
+      ...formData,
+      id: Date.now(),
+      timestamp: new Date(formData.date).getTime()
+    };
+    setRecords([newRecord, ...records]);
+    // 重置表單
+    setFormData({
+      date: getTodayStr(),
+      photo: null,
+      brewTime: '',
+      brewMethod: 'V60',
+      roastLevel: '淺烘焙',
+      origin: '',
+      notes: ''
+    });
+    setView('history');
+  };
+
+  // 過濾月份紀錄
+  const filteredRecords = useMemo(() => {
+    return records.filter(record => {
+      const d = new Date(record.date);
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+    });
+  }, [records, selectedMonth, selectedYear]);
+
+  // 切換月份
+  const changeMonth = (offset) => {
+    let newMonth = selectedMonth + offset;
+    let newYear = selectedYear;
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear -= 1;
+    } else if (newMonth > 11) {
+      newMonth = 0;
+      newYear += 1;
+    }
+    setSelectedMonth(newMonth);
+    setSelectedYear(newYear);
+  };
+
+  return (
+    <div className="min-h-screen font-sans text-slate-800 relative">
+      {/* 背景層 - 海邊咖啡店 */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center pointer-events-none"
+        style={{ 
+          backgroundImage: 'url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2073")',
+          opacity: 0.15
+        }}
+      />
+
+      <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
+        {/* Header */}
+        <header className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-amber-900 mb-2 drop-shadow-sm">오늘커피 ☕️</h1>
+          <p className="text-amber-700 tracking-widest uppercase text-sm">Today’s Coffee</p>
+        </header>
+
+        {/* Navigation */}
+        <nav className="flex bg-white/60 backdrop-blur-md rounded-2xl p-1 mb-8 shadow-sm border border-white/50">
+          <button 
+            onClick={() => setView('add')}
+            className={`flex-1 py-3 flex items-center justify-center gap-2 rounded-xl transition-all ${view === 'add' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-600 hover:bg-white/40'}`}
+          >
+            <PlusCircle size={18} /> 紀錄
+          </button>
+          <button 
+            onClick={() => setView('history')}
+            className={`flex-1 py-3 flex items-center justify-center gap-2 rounded-xl transition-all ${view === 'history' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-600 hover:bg-white/40'}`}
+          >
+            <Calendar size={18} /> 月曆
+          </button>
+          <button 
+            onClick={() => setView('guide')}
+            className={`flex-1 py-3 flex items-center justify-center gap-2 rounded-xl transition-all ${view === 'guide' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-600 hover:bg-white/40'}`}
+          >
+            <BookOpen size={18} /> 指南
+          </button>
+        </nav>
+
+        {/* 主要內容區 */}
+        <main className="pb-20">
+          
+          {/* 1. 新增紀錄功能 */}
+          {view === 'add' && (
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/80">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-2 border-b pb-4">
+                <Coffee className="text-amber-600" /> 紀錄今天的味道
+              </h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* 照片上傳 */}
+                <div className="relative group">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handlePhotoUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-full aspect-square md:aspect-video rounded-2xl border-2 border-dashed border-amber-200 bg-amber-50/30 flex flex-col items-center justify-center overflow-hidden transition-all group-hover:bg-amber-50">
+                    {formData.photo ? (
+                      <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <Camera size={40} className="text-amber-300 mb-2" />
+                        <p className="text-amber-500 font-medium">點擊上傳咖啡美照</p>
+                      </>
+                    )}
+                  </div>
                 </div>
+
+                {/* 日期選擇 */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-semibold text-slate-500 flex items-center gap-1">
+                    <Calendar size={14} /> 日期
+                  </label>
+                  <input 
+                    type="date" 
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {/* 沖煮方式 */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-slate-500 flex items-center gap-1">
+                      <ClipboardList size={14} /> 沖煮方式
+                    </label>
+                    <select 
+                      value={formData.brewMethod}
+                      onChange={(e) => setFormData({...formData, brewMethod: e.target.value})}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none"
+                    >
+                      <option>V60</option>
+                      <option>摺紙濾杯</option>
+                      <option>法蘭絨</option>
+                      <option>浸泡式</option>
+                      <option>愛樂壓</option>
+                    </select>
+                  </div>
+
+                  {/* 烘焙度 */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-slate-500 flex items-center gap-1">
+                      <Coffee size={14} /> 烘焙度
+                    </label>
+                    <select 
+                      value={formData.roastLevel}
+                      onChange={(e) => setFormData({...formData, roastLevel: e.target.value})}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none"
+                    >
+                      <option>極淺烘焙</option>
+                      <option>淺烘焙</option>
+                      <option>中烘焙</option>
+                      <option>深烘焙</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {/* 沖煮時間 */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-slate-500 flex items-center gap-1">
+                      <Clock size={14} /> 沖煮時間
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder="例如: 2:30"
+                      value={formData.brewTime}
+                      onChange={(e) => setFormData({...formData, brewTime: e.target.value})}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  {/* 產區或名稱 */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-slate-500 flex items-center gap-1">
+                      <MapPin size={14} /> 產區 / 名稱
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder="例如: 衣索比亞"
+                      value={formData.origin}
+                      onChange={(e) => setFormData({...formData, origin: e.target.value})}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                </div>
+
+                {/* 心得 */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-semibold text-slate-500">心得與筆記</label>
+                  <textarea 
+                    rows="3"
+                    placeholder="今天的咖啡喝起來..."
+                    value={formData.notes}
+                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                  ></textarea>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full bg-amber-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-amber-900/20 hover:bg-amber-800 transition-colors mt-4"
+                >
+                  儲存紀錄
+                </button>
+              </form>
             </div>
-            <div class="form-group">
-                <label>心得:</label>
-                <textarea id="notes" placeholder="分享你的沖煮心得..."></textarea>
-            </div>
-            <button class="submit" onclick="saveRecord()">儲存記錄</button>
-        </section>
+          )}
 
-        <!-- 沖煮方法步驟區 -->
-        <section id="methods-section" style="display: none;">
-            <h2>沖煮方法步驟</h2>
-            
-            <h3>一刀流沖煮法</h3>
-            <p><strong>推薦比例:</strong> 1:15 至 1:17 (咖啡:水)</p>
-            <p><strong>水溫:</strong> 90-92°C</p>
-            <ol class="steps">
-                <li>將咖啡粉放入濾杯，倒入濾紙。</li>
-                <li>進行悶蒸 (Bloom)：倒入 2x 咖啡重量的水，靜置 40-45 秒。</li>
-                <li>開始注水：以穩定的流速，一次性持續注水至達到目標總水量。</li>
-                <li>保持穩定的注水流速，不中斷，直到所有水都通過咖啡粉。</li>
-                <li>總萃取時間約 2.5-3 分鐘。</li>
-                <li>享受您的咖啡！</li>
-            </ol>
-            
-            <h3>四六沖法</h3>
-            <p><strong>推薦比例:</strong> 1:16 (咖啡:水)</p>
-            <p><strong>水溫:</strong> 92-94°C</p>
-            <p><strong>說明:</strong> 分為四個階段，第一階段 (40%)、第二階段 (30%)、第三階段 (20%)、第四階段 (10%) 的注水方式</p>
-            <ol class="steps">
-                <li>進行悶蒸：倒入 2x 咖啡重量的水，靜置 45-50 秒。</li>
-                <li><strong>第一階段 (40%):</strong> 注入 40% 的總水量，用小圓圈注水方式，時間約 50 秒。</li>
-                <li>等待 30 秒，讓咖啡粉充分浸泡。</li>
-                <li><strong>第二階段 (30%):</strong> 注入 30% 的總水量，繼續用小圓圈注水，時間約 40 秒。</li>
-                <li>等待 20 秒。</li>
-                <li><strong>第三階段 (20%):</strong> 注入 20% 的總水量，時間約 30 秒。</li>
-                <li>等待 15 秒。</li>
-                <li><strong>第四階段 (10%):</strong> 注入最後 10% 的水量，完成萃取。</li>
-                <li>總萃取時間約 3-3.5 分鐘。</li>
-                <li>享受層次豐富的咖啡風味！</li>
-            </ol>
-        </section>
+          {/* 2. 月份歷史紀錄 */}
+          {view === 'history' && (
+            <div className="space-y-6">
+              {/* 月份導航 */}
+              <div className="flex items-center justify-between bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-white/80">
+                <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-amber-100 rounded-full transition-colors">
+                  <ChevronLeft />
+                </button>
+                <h2 className="text-lg font-bold text-amber-900">
+                  {selectedYear} 年 {selectedMonth + 1} 月
+                </h2>
+                <button onClick={() => changeMonth(1)} className="p-2 hover:bg-amber-100 rounded-full transition-colors">
+                  <ChevronRight />
+                </button>
+              </div>
 
-        <!-- 查看記錄區 -->
-        <section id="view-section" style="display: none;">
-            <h2>查看記錄</h2>
-                <div class="form-group">
-                <label>選擇月份查看:</label>
-                <select id="month-select" onchange="showMonth()">
-                    <option value="">選擇月份</option>
-                </select>
-            </div>
-            <div id="month-view" class="month-view"></div>
-            
-            <h3 style="margin-top: 30px;">所有記錄</h3>
-            <div id="single-records"></div>
-        </section>
-
-        <!-- 指南區 -->
-        <section id="guide-section" style="display: none;">
-        </section>
-    </div>
-
-    <script>
-        let records = JSON.parse(localStorage.getItem('coffeeRecords')) || [];
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('record-date').value = today;
-        document.getElementById('photo').addEventListener('change', previewPhoto);
-        // show saved records if any
-        updateRecords();
-
-        function previewPhoto(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    document.getElementById('preview').src = ev.target.result;
-                    document.getElementById('preview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function saveRecord() {
-            const photoFile = document.getElementById('photo').files[0];
-            const recordDate = document.getElementById('record-date').value;
-            const time = document.getElementById('time').value;
-            const brewTimeOfDay = document.getElementById('brew-time').value;
-            const temperature = document.getElementById('temperature').value;
-            const ratio = document.getElementById('ratio').value;
-            const method = document.getElementById('method').value;
-            const roast = document.getElementById('roast').value;
-            const bean = document.getElementById('bean').value;
-            const flavors = [];
-            if (document.getElementById('flavor-floral').checked) flavors.push('花香');
-            if (document.getElementById('flavor-fruity').checked) flavors.push('果酸');
-            if (document.getElementById('flavor-nutty').checked) flavors.push('堅果');
-            const notes = document.getElementById('notes').value;
-
-            if (!photoFile || !recordDate) {
-                alert('請上傳相片並選擇日期！');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const record = {
-                    id: Date.now(),
-                    date: recordDate,
-                    photo: e.target.result,
-                        time,
-                    brewTimeOfDay,
-                    brewTimeOfDay,
-                    temperature,
-                    ratio,
-                    method,
-                    roast,
-                    bean,
-                    flavors,
-                    notes
-                };
-                records.unshift(record);
-                localStorage.setItem('coffeeRecords', JSON.stringify(records));
-                alert('記錄已儲存！');
-                clearForm();
-                showSection('view');
-                updateRecords();
-            };
-            reader.readAsDataURL(photoFile);
-        }
-
-        function clearForm() {
-            document.getElementById('photo').value = '';
-            document.getElementById('record-date').value = today;
-            document.getElementById('time').value = '';
-            document.getElementById('brew-time').value = '';
-            document.getElementById('temperature').value = '';
-            document.getElementById('ratio').value = '';
-            document.getElementById('bean').value = '';
-            document.getElementById('flavor-floral').checked = false;
-            document.getElementById('flavor-fruity').checked = false;
-            document.getElementById('flavor-nutty').checked = false;
-            document.getElementById('notes').value = '';
-            document.getElementById('preview').style.display = 'none';
-        }
-
-        function showSection(section) {
-            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            // attempt to highlight corresponding button
-            const btn = document.querySelector(`nav button[onclick="showSection('${section}')"]`);
-            if (btn) btn.classList.add('active');
-            if (section === 'record') {
-                document.getElementById('record-section').style.display = 'block';
-            } else if (section === 'view') {
-                document.getElementById('view-section').style.display = 'block';
-                updateRecords();
-            } else if (section === 'methods') {
-                document.getElementById('methods-section').style.display = 'block';
-            }
-        }
-
-        function updateRecords() {
-            const singleDiv = document.getElementById('single-records');
-            if (records.length === 0) {
-                singleDiv.innerHTML = '<p style="color: #999;">暫沒有記錄，開始紀錄你的咖啡故事吧！</p>';
-            } else {
-                singleDiv.innerHTML = records.map(r => `
-                    <div class="record">
-                        <img src="${r.photo}" alt="咖啡相片">
-                        <div class="record-meta">
-                            <p><strong>日期:</strong> ${r.date}</p>
-                            ${r.brewTimeOfDay ? `<p><strong>沖煮時刻:</strong> ${r.brewTimeOfDay}</p>` : ''}
-                            <p><strong>時間:</strong> ${r.time} 分</p>
-                            <p><strong>水溫:</strong> ${r.temperature ? r.temperature + '°C' : '未記錄'}</p>
-                            <p><strong>水粉比例:</strong> ${r.ratio || '未記錄'}</p>
-                            <p><strong>方式:</strong> ${r.method}</p>
-                            <p><strong>烘焙:</strong> ${r.roast}</p>
-                            <p><strong>豆子:</strong> ${r.bean}</p>
-                            <p><strong>感官風味:</strong> ${r.flavors && r.flavors.length > 0 ? r.flavors.join('、') : '未選擇'}</p>
-                            <p><strong>心得:</strong> ${r.notes}</p>
-                            <button onclick="deleteRecord(${r.id})" style="background: #e74c3c; padding: 5px 10px; margin-top: 10px;">刪除</button>
+              {/* 紀錄網格 */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {filteredRecords.length > 0 ? (
+                  filteredRecords.map(record => (
+                    <div 
+                      key={record.id} 
+                      onClick={() => setDetailRecord(record)}
+                      className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-white/80 hover:shadow-md transition-all"
+                    >
+                      <div className="aspect-square bg-slate-100 overflow-hidden relative">
+                        {record.photo ? (
+                          <img src={record.photo} alt="Brew" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-300">
+                            <Coffee size={32} />
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 bg-black/40 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-sm">
+                          {record.date.split('-')[2]}日
                         </div>
+                      </div>
+                      <div className="p-3">
+                        <p className="text-xs font-bold truncate text-slate-800">{record.origin || '無標題'}</p>
+                        <p className="text-[10px] text-slate-500 truncate">{record.brewMethod}</p>
+                      </div>
                     </div>
-                `).join('');
-            }
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 text-center bg-white/40 rounded-3xl border border-dashed border-slate-300">
+                    <p className="text-slate-500 italic">這個月還沒有紀錄喔～</p>
+                    <button onClick={() => setView('add')} className="mt-4 text-amber-700 font-bold flex items-center gap-1 mx-auto">
+                      <PlusCircle size={16} /> 去寫第一篇
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
-            const months = [...new Set(records.map(r => r.date.slice(0,7)))].sort().reverse();
-            const select = document.getElementById('month-select');
-            select.innerHTML = '<option value="">選擇月份</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
-        }
+          {/* 3. 沖煮指南 */}
+          {view === 'guide' && (
+            <div className="space-y-6">
+              <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-white/80">
+                <h2 className="text-2xl font-bold text-amber-900 mb-6 flex items-center gap-2">
+                  <Info className="text-amber-600" /> 手沖咖啡指南
+                </h2>
 
-        function showMonth() {
-            const month = document.getElementById('month-select').value;
-            const monthDiv = document.getElementById('month-view');
-            if (!month) {
-                monthDiv.innerHTML = '';
-                return;
-            }
-            const monthRecords = records.filter(r => r.date.startsWith(month));
-            if (monthRecords.length === 0) {
-                monthDiv.innerHTML = '<p style="color: #999;">該月份暫無記錄</p>';
-            } else {
-                monthDiv.innerHTML = monthRecords.map(r => `
-                    <div class="thumbnail">
-                        <img src="${r.photo}" onclick="viewDetail(${r.id})" title="${r.notes.substring(0,50)}...">
-                        <p>${r.date.slice(8)} 日</p>
+                <div className="space-y-8">
+                  <section>
+                    <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2 border-l-4 border-amber-600 pl-3">黃金比例</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+                        <p className="text-xs text-amber-600 font-bold mb-1">粉水比</p>
+                        <p className="text-xl font-black text-amber-900">1 : 15</p>
+                        <p className="text-[10px] text-amber-700 mt-1">例如：20g 粉對 300ml 水</p>
+                      </div>
+                      <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+                        <p className="text-xs text-amber-600 font-bold mb-1">建議水溫</p>
+                        <p className="text-xl font-black text-amber-900">90 - 92°C</p>
+                        <p className="text-[10px] text-amber-700 mt-1">淺烘焙建議較高溫</p>
+                      </div>
                     </div>
-                `).join('');
-            }
-        }
+                  </section>
 
-        function viewDetail(id) {
-            const record = records.find(r => r.id === id);
-            if (record) {
-                const flavorsText = record.flavors && record.flavors.length > 0 ? record.flavors.join('、') : '未選擇';
-                alert(`日期: ${record.date}${record.brewTimeOfDay ? '\n沖煮時刻: ' + record.brewTimeOfDay : ''}\n時間: ${record.time} 分鐘\n水溫: ${record.temperature ? record.temperature + '°C' : '未記錄'}\n水粉比例: ${record.ratio || '未記錄'}\n方式: ${record.method}\n烘焙: ${record.roast}\n豆子: ${record.bean}\n感官風味: ${flavorsText}\n心得: ${record.notes}`);
-            }
-        }
+                  <section>
+                    <h3 className="text-lg font-bold text-amber-800 mb-4 flex items-center gap-2 border-l-4 border-amber-600 pl-3">沖煮步驟 (4:6 簡易法)</h3>
+                    <div className="space-y-4">
+                      {[
+                        { step: "01", title: "悶蒸", content: "注入約 2 倍粉量的水（40ml），等待 30 秒。" },
+                        { step: "02", title: "第一段萃取", content: "穩定繞圈注水至 120ml。此段影響風味酸甜感。" },
+                        { step: "03", title: "第二段萃取", content: "水流乾後，注入至 200ml。維持溫度與流速。" },
+                        { step: "04", title: "最後注水", content: "分次注入剩餘水分至 300ml，總時約 2:30-3:00。" }
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex gap-4">
+                          <span className="text-2xl font-black text-amber-200 italic leading-none">{item.step}</span>
+                          <div>
+                            <p className="font-bold text-slate-800 mb-1">{item.title}</p>
+                            <p className="text-sm text-slate-600 leading-relaxed">{item.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
 
-        function deleteRecord(id) {
-            if (confirm('確定要刪除這筆記錄嗎？')) {
-                records = records.filter(r => r.id !== id);
-                localStorage.setItem('coffeeRecords', JSON.stringify(records));
-                updateRecords();
-                showMonth();
-                alert('記錄已刪除！');
-            }
-        }
+        {/* 紀錄詳情 Modal */}
+        {detailRecord && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDetailRecord(null)}></div>
+            <div className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+              <button 
+                onClick={() => setDetailRecord(null)}
+                className="absolute top-4 right-4 z-10 p-2 bg-black/20 text-white rounded-full hover:bg-black/40 transition-colors"
+              >
+                <X size={20} />
+              </button>
 
-    </script>
+              <div className="h-64 bg-slate-200 relative">
+                {detailRecord.photo ? (
+                  <img src={detailRecord.photo} alt="Detail" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-400">
+                    <Coffee size={64} />
+                  </div>
+                )}
+              </div>
 
-</body>
-</html>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <p className="text-xs text-amber-600 font-bold uppercase tracking-wider mb-1">{detailRecord.date}</p>
+                    <h3 className="text-2xl font-black text-slate-900">{detailRecord.origin || "無名咖啡豆"}</h3>
+                  </div>
+                  <div className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold">
+                    {detailRecord.roastLevel}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-slate-100 rounded-lg text-slate-500">
+                      <Clock size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">沖煮時間</p>
+                      <p className="text-sm font-bold text-slate-700">{detailRecord.brewTime || '--'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-slate-100 rounded-lg text-slate-500">
+                      <ClipboardList size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">沖煮方式</p>
+                      <p className="text-sm font-bold text-slate-700">{detailRecord.brewMethod}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <p className="text-xs text-slate-400 font-bold mb-2 uppercase tracking-wide">品飲心得</p>
+                  <p className="text-slate-700 leading-relaxed italic">
+                    {detailRecord.notes || "今天這杯咖啡很安靜，沒有留下什麼話。"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
