@@ -48,7 +48,7 @@
             position: relative;
         }
 
-        /* 🎨 可愛水彩手繪背景 (牛角包、鬆餅、各類咖啡，無咖啡豆) */
+        /* 🎨 可愛水彩手繪背景 (無咖啡豆版本) */
         body::before {
             content: '';
             position: fixed;
@@ -62,13 +62,13 @@
         }
 
         /* ----------------------------------
-           復古拼貼裝飾系統 (清理版)
+           復古拼貼裝飾系統
            ---------------------------------- */
         .scrap {
             position: absolute;
             pointer-events: none;
             filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.1));
-            z-index: 0; /* 設定在最底層，保證不遮擋任何按鈕或文字 */
+            z-index: 0;
         }
 
         .scrap-inner {
@@ -81,9 +81,9 @@
             background-color: #E8DCCB;
             color: rgba(92, 64, 51, 0.5);
             font-family: 'Times New Roman', Times, serif;
-            font-size: 12px; /* 放大文字 */
+            font-size: 11px;
             line-height: 1.2;
-            padding: 10px 15px;
+            padding: 8px;
             text-align: justify;
             overflow: hidden;
             border: 1px solid rgba(180, 150, 130, 0.2);
@@ -132,6 +132,8 @@
             letter-spacing: 2px;
             margin-bottom: 5px;
             font-weight: 700;
+            position: relative;
+            z-index: 10; /* 保證不被報紙遮擋 */
         }
 
         h1 {
@@ -142,6 +144,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            position: relative;
+            z-index: 10; /* 保證不被報紙遮擋 */
         }
 
         .decor-icon { font-size: 1.8rem; }
@@ -235,7 +239,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* 輸入框邊界修正 */
+        /* 輸入框邊界與對齊修正 */
         input[type="text"], input[type="number"], input[type="date"], input[type="time"], select, textarea {
             width: 100%;
             max-width: 100%;
@@ -269,7 +273,6 @@
             background-attachment: local;
         }
 
-        /* 標籤容器，支援橫向滑動，防止切邊 */
         .tags-container {
             display: flex;
             flex-wrap: nowrap; 
@@ -367,7 +370,6 @@
             position: relative;
         }
 
-        /* 滑桿佈局修正，防止右側出界 */
         .sliders-grid {
             display: grid;
             grid-template-columns: 1fr; 
@@ -443,6 +445,7 @@
             transform: translateY(-2px);
         }
 
+        /* 咖啡櫃卡片樣式 */
         .record-card {
             background: #FFF;
             padding: 15px 15px 25px 15px;
@@ -573,12 +576,14 @@
 <body>
 
     <header>
-        <!-- ✅ 完美拼貼：放大、移低，並設置 z-index: 0 確保不阻擋文字和按鈕 -->
-        <div class="scrap scrap-text" style="top: 80px; left: 10px; width: 170px; height: 110px; transform: rotate(-6deg); z-index: 0;">
+        <!-- ✅ 完美的拼貼：移至最頂，透明度調低，並放在底層以防遮擋文字 -->
+        <div class="scrap scrap-text" style="top: 15px; left: 10px; width: 130px; height: 80px; transform: rotate(-6deg); z-index: 0; opacity: 0.85;">
             <div class="scrap-inner">
                 Coffee is a brewed drink prepared from roasted coffee beans. The seeds of the Coffea species...
             </div>
         </div>
+        <!-- 黏住報紙的白色紙膠帶 -->
+        <div class="washi-tape-fixed washi-white" style="top: 5px; left: 40px; transform: rotate(10deg); z-index: 1;"></div>
         
         <!-- 右上方優雅的復古蝴蝶 -->
         <div class="vintage-element" style="top: 40px; right: 25px; font-size: 40px; transform: rotate(15deg);">🦋</div>
@@ -599,7 +604,6 @@
             
             <!-- 卡片 1：影像與時間 -->
             <div class="journal-card card-kraft">
-                <!-- 乾淨的頂部居中膠帶 -->
                 <div class="washi-tape-fixed washi-kraft" style="top: -12px; left: 50%; transform: translateX(-50%) rotate(-2deg);"></div>
                 
                 <div class="record-header-compact">
@@ -669,7 +673,6 @@
 
             <!-- 卡片 2：沖煮參數 -->
             <div class="journal-card card-grid">
-                <!-- 右上角網格膠帶 -->
                 <div class="washi-tape-fixed washi-grid" style="top: -12px; right: 20px; transform: rotate(15deg);"></div>
                 
                 <div class="form-group">
@@ -712,7 +715,6 @@
 
             <!-- 卡片 3：雷達圖與筆記 -->
             <div class="journal-card card-note">
-                <!-- 左上角白色膠帶 -->
                 <div class="washi-tape-fixed washi-white" style="top: -10px; left: 20px; transform: rotate(-10deg);"></div>
                 
                 <div class="radar-container">
@@ -867,7 +869,7 @@
             }
         }
 
-        // ✅ 自動圖片壓縮功能 (專為 localStorage 與 iOS 設計)
+        // ✅ 自動圖片壓縮 (保護 LocalStorage 容量，適合日更使用)
         function handlePhotoUpload(e) {
             const file = e.target.files[0];
             if (file) {
@@ -876,7 +878,7 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        // 設定壓縮後的最大尺寸 (減輕 localStorage 負擔)
+                        // 設定壓縮最大寬高 (減輕存儲負擔)
                         const MAX_WIDTH = 800;
                         const MAX_HEIGHT = 800;
                         let width = img.width;
@@ -899,7 +901,7 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // 轉換為輕量化 JPEG，畫質 0.7
+                        // 轉換為輕便的 JPEG 格式
                         photoDataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
                         const preview = document.getElementById('preview-img');
@@ -983,7 +985,8 @@
 
         function drawRadarChart(canvas, scores, isMini = false) {
             const dpr = window.devicePixelRatio || 1;
-            const displaySize = isMini ? 180 : 300; 
+            // ✅ 稍微放大卡片內雷達圖，確保有空間容納文字
+            const displaySize = isMini ? 240 : 300; 
 
             canvas.width = displaySize * dpr;
             canvas.height = displaySize * dpr;
@@ -997,8 +1000,10 @@
             const w = displaySize;
             const h = displaySize;
             const cx = w / 2;
-            const cy = (isMini ? h/2 : h/2 + 10);
-            const radius = isMini ? Math.min(w, h)/2.4 : Math.min(w, h)/3.0;
+            const cy = (isMini ? h/2 + 5 : h/2 + 10);
+            
+            // ✅ 微調半徑，留出足夠邊距畫文字
+            const radius = isMini ? Math.min(w, h)/3.2 : Math.min(w, h)/3.0;
 
             ctx.clearRect(0, 0, w, h);
 
@@ -1006,6 +1011,7 @@
             const keys = ['aroma', 'acidity', 'sweetness', 'body', 'aftertaste'];
             const levels = 5;
 
+            // 繪製網格
             ctx.strokeStyle = 'rgba(188, 170, 164, 0.6)';
             ctx.lineWidth = 1;
             for (let i = 1; i <= levels; i++) {
@@ -1022,6 +1028,7 @@
                 ctx.stroke();
             }
 
+            // 繪製軸線與 ✅強制加上中文字標籤 (無論大小)
             for (let j = 0; j < 5; j++) {
                 const angle = -Math.PI/2 + (Math.PI * 2 * j / 5);
                 ctx.beginPath();
@@ -1030,18 +1037,19 @@
                 ctx.strokeStyle = 'rgba(188, 170, 164, 0.6)';
                 ctx.stroke();
 
-                if (!isMini) {
-                    const labelR = radius + 24; 
-                    const lx = cx + labelR * Math.cos(angle);
-                    const ly = cy + labelR * Math.sin(angle);
-                    ctx.fillStyle = '#4A332A';
-                    ctx.font = '13px "Noto Sans TC"';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(labels[j], lx, ly);
-                }
+                // 計算文字位置
+                const labelR = radius + (isMini ? 18 : 24); 
+                const lx = cx + labelR * Math.cos(angle);
+                const ly = cy + labelR * Math.sin(angle);
+                
+                ctx.fillStyle = '#4A332A';
+                ctx.font = (isMini ? '11px' : '13px') + ' "Noto Sans TC"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(labels[j], lx, ly);
             }
 
+            // 繪製數值區塊
             ctx.beginPath();
             for (let j = 0; j < 5; j++) {
                 const angle = -Math.PI/2 + (Math.PI * 2 * j / 5);
@@ -1061,6 +1069,7 @@
             ctx.lineWidth = 2.5;
             ctx.stroke();
 
+            // 繪製數值圓點
             ctx.fillStyle = '#D35400';
             for (let j = 0; j < 5; j++) {
                 const angle = -Math.PI/2 + (Math.PI * 2 * j / 5);
@@ -1116,7 +1125,6 @@
 
             records.unshift(record);
             
-            // 加入 Try-Catch 以防止 localStorage 爆滿的極端情況
             try {
                 localStorage.setItem('coffeeJournalRecords', JSON.stringify(records));
                 updateMonthSelect();
@@ -1124,7 +1132,7 @@
                 resetForm();
                 showSection('view');
             } catch (e) {
-                // 如果真的滿了，退回剛才加入的記錄並提示
+                // 極端情況處理：如 LocalStorage 真的滿了
                 records.shift();
                 alert('糟糕！設備儲存空間不足，請先刪除部分舊記錄。');
                 console.error(e);
@@ -1230,6 +1238,7 @@
                 `;
             }).join('');
 
+            // 確保 DOM 渲染完畢後，畫出每一個小雷達圖
             filteredRecords.forEach(r => {
                 const canvas = document.getElementById(`canvas-${r.id}`);
                 if (canvas && r.radar) {
